@@ -1,0 +1,171 @@
+---
+title: "BIOL2010 prac series two"
+output: 
+  learnr::tutorial:
+    progressive: true
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+
+# attach packages
+library(DT)
+library(forcats)
+library(learnr)
+library(knitr)
+library(readxl) 
+library(tidyverse) # always last
+
+# custom theme for two-tier bar plots (faceted)
+theme_biol2010 <- function(){
+  theme_classic() %+replace%
+  theme(axis.text = element_text(colour = "black",
+                                 size = rel(0.75)),
+        strip.placement = "outside",
+        strip.background = element_blank())
+}
+
+set.seed(2010)
+
+# import data -- use point level for workshop
+dat <- read_excel("data/BIOL2010-prac-2-2024.xlsx",
+                  sheet = "point_level")
+
+plot_dat <- dat %>% 
+  group_by(ecosystem) %>% 
+  summarise(mean_ba = mean(ba, na.rm = TRUE),
+            se_ba = sd(ba, na.rm = TRUE)/sqrt(n()))
+
+```
+
+## Visions of data
+###
+Have a look at your data below! (at the per-point level)
+
+```{r view-data, echo=FALSE}
+
+datatable(dat,
+          rownames = FALSE,
+          options = list(dom = "lpt"))
+
+```
+<br>
+What are two options for visualising this data?
+
+###
+Let's first make a ___bar plot___, showing a:
+
+* __categorical predictor__; with a
+* __continuous response__.
+
+```{r bar-plot, exercise=TRUE}
+
+ggplot(data = plot_dat,
+       aes(x = PRED_VAR)) +
+  geom_SOMETHING(aes(y = RESP_VAR),
+           fill = "yellow",
+           colour = "red",
+           width = 0.25) +
+  geom_SOMETHING(aes(ymin = SOMETHING,
+                     ymax = SOMETHING),
+                width = 0) +
+  scale_x_discrete(name = "something here about ecosystem please",
+                   labels = c("mmmmm delicious mud",
+                              "pov: you did not have to climb down the slope")) +
+  scale_y_continuous(name = "what is basal area??",
+                     expand = expansion(mult = c(0, 0.05))) +
+  theme_biol2010()
+
+```
+
+###
+Now, let's make a ___scatter plot___, showing a:
+
+* __continuous predictor__; plus a
+* __categorical predictor__; with a
+* __continuous response__.
+
+```{r scatter-plot, message=FALSE, warning=FALSE, exercise=TRUE}
+
+ggplot(data = dat,
+       aes(x = CONT_PRED_VAR, 
+           y = RESP_VAR,
+           colour = CAT_PRED_VAR)) +
+  geom_SOMETHING() +
+  geom_smooth(method = "lm",
+              se = TRUE, fill = "yellow") +
+  scale_colour_discrete(name = "Ecosystem",
+                        labels = c("Mangrove",
+                                   "Sclerophyll")) +
+  # sure would be a shame if someone labelled those there axes...
+  theme_biol2010() %+replace%
+  theme(axis.title.x = element_text(margin = margin(6, 0, 0, 0)))
+  
+```
+
+You should now have two options for making plots --- including working, modify-able code for each. We'll talk about how you can remix it for the real data, later.
+
+## Making a difference
+###
+For each of our two plots, let's recap how to analyse their data, and interpret the results.
+
+Firstly for our ___bar plot___ research question --- what statistical test is appropriate?
+
+###
+We will use an **a**nalysis **o**f **v**ariance.
+```{r anova-stat, exercise=TRUE}
+
+bar_plot_vibes <- SOME_TEST(RESP_VAR ~ PRED_VAR,
+                      data = dat)
+
+summary(bar_plot_vibes)
+
+```
+
+###
+And now for our ___scatter plot___ research question --- what statistical test is appropriate?
+
+###
+We will use a **l**inear **m**odel.
+
+```{r lm-stat, exercise=TRUE}
+
+scatter_plot_vibes <- SOME_TEST(RESP_VAR ~ CONT_PRED_VAR * CAT_PRED_VAR,
+                         data = dat)
+
+summary(scatter_plot_vibes)
+
+```
+
+## Time to tidy up
+###
+Wrangling the data will always be your first step in R. We skipped to the second and third steps of visualising and analysing to start the class. Time to catch up on forgotten fun!
+
+Let's practice some example data tidying together. 
+
+###
+__Making means and SEs for bar plots:__ `group_by()` and `summarise()` work together for this. 
+
+```{r summarise-tidy, message=FALSE, exercise=TRUE}
+
+plot_dat <- dat %>% 
+  FUNCTION_1(PRED_VAR) %>% 
+  FUNCTION_2(SOMETHING_ABOUT_RESP_VAR)
+# you may need to use 'na.rm = TRUE' to avoid
+# issues with missing data
+
+plot_dat
+
+```
+
+## Moving out
+
+You have now successfully:
+
+* recalled two types of research questions; 
+* designed R code for a plot of each;
+* designed R code for an analysis of each; 
+* enjoyed a crash-course interpretation refresher; and
+* been introduced to some data tidying functions.
+
+You can find a 'skeleton script' with these elements in the R project folder you downloaded at the start of the prac. Open this and work to develop your own research question, figure(s) and analysis.
