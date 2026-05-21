@@ -28,8 +28,8 @@ dat <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
                   sheet = "point_level") %>% 
   arrange(ecosystem) %>% 
   add_column(leaf_carbon = c(
-    rnorm(n = 53, mean = 20, sd = 3),
-    rnorm(n = 48, mean = 60, sd = 3))
+    rnorm(n = 53, mean = 20, sd = 7),
+    rnorm(n = 48, mean = 60, sd = 7))
   ) %>% 
   mutate(leaf_carbon = round(leaf_carbon, 2)) %>% 
   arrange(transect_id, point)
