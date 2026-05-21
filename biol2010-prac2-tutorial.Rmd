@@ -25,7 +25,14 @@ set.seed(2010)
 
 # import data -- use point level for workshop
 dat <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
-                  sheet = "point_level")
+                  sheet = "point_level") %>% 
+  arrange(ecosystem) %>% 
+  add_column(leaf_carbon = c(
+    rnorm(n = 53, mean = 20, sd = 3),
+    rnorm(n = 48, mean = 60, sd = 3))
+  ) %>% 
+  mutate(leaf_carbon = round(leaf_carbon, 2)) %>% 
+  arrange(transect_id, point)
 
 # and quarter level available for open-ended work
 dat_quarters <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
@@ -40,8 +47,8 @@ dat_quarters <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
 
 dat_plot <- dat %>% 
   group_by(ecosystem) %>% 
-  summarise(mean_ba = mean(ba, na.rm = TRUE),
-            se_ba = sd(ba, na.rm = TRUE)/sqrt(n()))
+  summarise(mean_leaf_carbon = mean(leaf_carbon, na.rm = TRUE),
+            se_leaf_carbon = sd(leaf_carbon, na.rm = TRUE)/sqrt(n()))
 
 ```
 
