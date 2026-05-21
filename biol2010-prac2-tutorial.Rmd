@@ -2,7 +2,13 @@
 title: "BIOL2010 prac series two"
 output: 
   learnr::tutorial:
-    progressive: true
+    progressive: TRUE
+    language:
+      en:
+        button:
+          continue: "continue"
+          previoustopic: "go back"
+          nexttopic: "continue"
 runtime: shiny_prerendered
 ---
 
@@ -16,37 +22,41 @@ library(knitr)
 library(readxl) 
 library(tidyverse) # always last
 
-# custom theme for two-tier bar plots (faceted)
-theme_biol2010 <- function(){
-  theme_classic() %+replace%
-  theme(axis.text = element_text(colour = "black",
-                                 size = rel(0.75)),
-        strip.placement = "outside",
-        strip.background = element_blank())
-}
-
 set.seed(2010)
 
 # import data -- use point level for workshop
 dat <- read_excel("data/BIOL2010-prac-2-2024.xlsx",
                   sheet = "point_level")
 
-plot_dat <- dat %>% 
+# and quarter level available for open-ended work
+dat_quarters <- read_excel("data/BIOL2010-prac-2-2024.xlsx",
+                           sheet = "quarter_level")
+
+# often folks want to twiddle axis text margins
+# theme(axis.title.x = element_text(margin = margin(6, 0, 0, 0)))
+
+```
+
+```{r setup-dat-plot, include=FALSE}
+
+dat_plot <- dat %>% 
   group_by(ecosystem) %>% 
   summarise(mean_ba = mean(ba, na.rm = TRUE),
             se_ba = sd(ba, na.rm = TRUE)/sqrt(n()))
 
 ```
 
+
 ## Visions of data
 ###
-Have a look at your data below! (at the per-point level)
+Have a look at your data below! (at the _point-level_ --- what does this mean?)
 
-```{r view-data, echo=FALSE}
+```{r data-view, echo=FALSE}
 
 datatable(dat,
           rownames = FALSE,
-          options = list(dom = "lpt"))
+          options = list(dom = "lpt",
+                         scrollX = TRUE))
 
 ```
 <br>
@@ -58,9 +68,9 @@ Let's first make a ___bar plot___, showing a:
 * __categorical predictor__; with a
 * __continuous response__.
 
-```{r bar-plot, exercise=TRUE}
+```{r plot-bar, exercise=TRUE, exercise.setup = "setup-dat-plot"}
 
-ggplot(data = plot_dat,
+ggplot(data = dat_plot,
        aes(x = PRED_VAR)) +
   geom_SOMETHING(aes(y = RESP_VAR),
            fill = "yellow",
@@ -68,13 +78,13 @@ ggplot(data = plot_dat,
            width = 0.25) +
   geom_SOMETHING(aes(ymin = SOMETHING,
                      ymax = SOMETHING),
-                width = 0) +
+                width = 0.8) +
   scale_x_discrete(name = "something here about ecosystem please",
                    labels = c("mmmmm delicious mud",
                               "pov: you did not have to climb down the slope")) +
   scale_y_continuous(name = "what is basal area??",
                      expand = expansion(mult = c(0, 0.05))) +
-  theme_biol2010()
+  theme_classic()
 
 ```
 
@@ -85,7 +95,7 @@ Now, let's make a ___scatter plot___, showing a:
 * __categorical predictor__; with a
 * __continuous response__.
 
-```{r scatter-plot, message=FALSE, warning=FALSE, exercise=TRUE}
+```{r plot-scatter, message=FALSE, warning=FALSE, exercise=TRUE}
 
 ggplot(data = dat,
        aes(x = CONT_PRED_VAR, 
@@ -95,15 +105,14 @@ ggplot(data = dat,
   geom_smooth(method = "lm",
               se = TRUE, fill = "yellow") +
   scale_colour_discrete(name = "Ecosystem",
-                        labels = c("Mangrove",
-                                   "Sclerophyll")) +
+                        labels = c("MMMMM angrove",
+                                   "SSSSS clerophyll")) +
   # sure would be a shame if someone labelled those there axes...
-  theme_biol2010() %+replace%
-  theme(axis.title.x = element_text(margin = margin(6, 0, 0, 0)))
+  theme_classic() 
   
 ```
 
-You should now have two options for making plots --- including working, modify-able code for each. We'll talk about how you can remix it for the real data, later.
+You should now have two options for making plots --- including working, modify-able code for each.
 
 ## Making a difference
 ###
@@ -113,7 +122,7 @@ Firstly for our ___bar plot___ research question --- what statistical test is ap
 
 ###
 We will use an **a**nalysis **o**f **v**ariance.
-```{r anova-stat, exercise=TRUE}
+```{r stat-anova, exercise=TRUE}
 
 bar_plot_vibes <- SOME_TEST(RESP_VAR ~ PRED_VAR,
                       data = dat)
@@ -128,7 +137,7 @@ And now for our ___scatter plot___ research question --- what statistical test i
 ###
 We will use a **l**inear **m**odel.
 
-```{r lm-stat, exercise=TRUE}
+```{r stat-lm, exercise=TRUE}
 
 scatter_plot_vibes <- SOME_TEST(RESP_VAR ~ CONT_PRED_VAR * CAT_PRED_VAR,
                          data = dat)
@@ -146,26 +155,69 @@ Let's practice some example data tidying together.
 ###
 __Making means and SEs for bar plots:__ `group_by()` and `summarise()` work together for this. 
 
-```{r summarise-tidy, message=FALSE, exercise=TRUE}
+```{r tidy-summarise, message=FALSE, exercise=TRUE}
 
-plot_dat <- dat %>% 
+dat_plot <- dat %>% 
   FUNCTION_1(PRED_VAR) %>% 
   FUNCTION_2(SOMETHING_ABOUT_RESP_VAR)
+
 # you may need to use 'na.rm = TRUE' to avoid
 # issues with missing data
 
-plot_dat
+dat_plot
 
 ```
 
-## Moving out
+###
+__Selecting data from one ecosystem:__ `filter()` is a good option, and maybe you'd also like to `select()` just your variables of interest. 
 
-You have now successfully:
+```{r tidy-filter, message=FALSE, exercise=TRUE}
 
-* recalled two types of research questions; 
-* designed R code for a plot of each;
-* designed R code for an analysis of each; 
-* enjoyed a crash-course interpretation refresher; and
-* been introduced to some data tidying functions.
+mang_dat <- dat %>% 
+  FUNCTION_1(SOMETHING_ABOUT_ECOSYSTEM) %>% 
+  FUNCTION_2(SOME_VARS_YOU_WANT)
 
-You can find a 'skeleton script' with these elements in the R project folder you downloaded at the start of the prac. Open this and work to develop your own research question, figure(s) and analysis.
+mang_dat
+
+```
+
+###
+__Creating a new variable:__ `mutate()` is very flexible, and fits nicely into a pipeline. 
+
+```{r tidy-mutate, message=FALSE, exercise=TRUE}
+
+mang_dat <- dat %>% 
+  filter(ecosystem == "mangrove") %>% 
+  FUNCTION_1(SOMETHING_FORMULAIC)
+
+# let's say you found an allometric equation that 
+# claimed that tree weight (in kg) was equal to:
+# basal area cubed, divided by 10
+
+mang_dat
+
+```
+
+## Werk werk werk werk werk
+
+Use this working space to design a figure and analysis to complete your practical journal for this week. Use your code from earlier in the tutorial!
+
+Recall that two datasets are available to you by default:
+
+* `dat` --- the _point-level_ dataset.
+* `dat_quarters` --- the _quarter-level_ dataset. 
+
+Need a refresher on the difference? Call them by name below and have a look!
+
+```{r working-space, message=FALSE, exercise=TRUE}
+
+# 1. tidy data
+# [your code here!]
+
+# 2. visualise data
+# [your code here!]
+
+# 3. analyse data
+# [your code here!]
+
+```
