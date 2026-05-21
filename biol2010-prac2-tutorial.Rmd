@@ -16,7 +16,6 @@ runtime: shiny_prerendered
 
 # attach packages
 library(DT)
-library(forcats)
 library(learnr)
 library(knitr)
 library(readxl) 
