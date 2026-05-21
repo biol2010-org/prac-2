@@ -45,7 +45,6 @@ dat_plot <- dat %>%
 
 ```
 
-
 ## Visions of data
 ###
 Have a look at your data below! (at the _point-level_ --- what does this mean?)
@@ -186,7 +185,7 @@ __Creating a new variable:__ `mutate()` is very flexible, and fits nicely into a
 ```{r tidy-mutate, message=FALSE, exercise=TRUE}
 
 mang_dat <- dat %>% 
-  filter(ecosystem == "mangrove") %>% 
+  filter(ecosystem == "mang") %>% 
   FUNCTION_1(SOMETHING_FORMULAIC)
 
 # let's say you found an allometric equation that 
