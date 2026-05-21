@@ -24,11 +24,11 @@ library(tidyverse) # always last
 set.seed(2010)
 
 # import data -- use point level for workshop
-dat <- read_excel("data/BIOL2010-prac-2-2024.xlsx",
+dat <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
                   sheet = "point_level")
 
 # and quarter level available for open-ended work
-dat_quarters <- read_excel("data/BIOL2010-prac-2-2024.xlsx",
+dat_quarters <- read_excel("data/BIOL2010-prac-2-2026.xlsx",
                            sheet = "quarter_level")
 
 # often folks want to twiddle axis text margins
